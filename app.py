@@ -223,15 +223,13 @@ def profile():
     form = UserAddForm(obj=user)
 
     if form.validate_on_submit():
-        if not user.authenticate(form.password.data):
+        if not user.authenticate(user.username, form.password.data):
             flash('Incorrect password.', 'danger')
             return redirect('/')
         
         user.usernamer = form.username.data
         user.email = form.email.data
         user.image_url = form.image_url.data
-        user.header_image_url = form.header_image_url.data
-        user.bio = form.bio.data
             
         db.session.commit()
 
