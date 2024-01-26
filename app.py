@@ -5,7 +5,7 @@ from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
 
 from forms import UserAddForm, LoginForm, MessageForm
-from models import db, connect_db, User, Message
+from models import db, connect_db, User, Message, Likes
 
 CURR_USER_KEY = "curr_user"
 
@@ -317,18 +317,36 @@ def homepage():
     """
 
     if g.user:
+        g.user_likes_ids = [like.message.id for like in g.user.likes]
+        print(g.user.likes)
         messages = (Message
                     .query
                     .filter(Message.user_id.in_([u.id for u in g.user.following]))
                     .order_by(Message.timestamp.desc())
                     .limit(100)
                     .all())
+        
 
         return render_template('home.html', messages=messages)
 
     else:
         return render_template('home-anon.html')
 
+##############################################################################
+# Likes route
+    
+@app.route('/users/add_like/<int:msg_id>', methods=['POST'])
+def add_like(msg_id):
+    "Adds a like to a post"
+    user = g.user
+    liked_message = msg_id
+
+    new_like = Likes(user_id=user.id, message_id=liked_message)
+    
+    db.session.add(new_like)
+    db.session.commit()
+
+    return redirect(f'/messages/{msg_id}')
 
 ##############################################################################
 # Turn off all caching in Flask
