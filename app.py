@@ -144,6 +144,8 @@ def list_users():
 def users_show(user_id):
     """Show user profile."""
 
+    g.user_likes_ids = [like.message.id for like in g.user.likes]
+
     user = User.query.get_or_404(user_id)
 
     # snagging messages in order from the database;
@@ -284,8 +286,8 @@ def messages_add():
 @app.route('/messages/<int:message_id>', methods=["GET"])
 def messages_show(message_id):
     """Show a message."""
-
     msg = Message.query.get(message_id)
+    g.user_likes_ids = [like.message.id for like in g.user.likes]
     return render_template('messages/show.html', message=msg)
 
 
@@ -318,7 +320,7 @@ def homepage():
 
     if g.user:
         g.user_likes_ids = [like.message.id for like in g.user.likes]
-        print(g.user.likes)
+        
         messages = (Message
                     .query
                     .filter(Message.user_id.in_([u.id for u in g.user.following]))
@@ -337,7 +339,7 @@ def homepage():
     
 @app.route('/users/add_like/<int:msg_id>', methods=['POST'])
 def add_like(msg_id):
-    "Adds a like to a post"
+    "Adds/Deletes a like from a post"
     user = g.user
     liked_message = msg_id
 
