@@ -341,10 +341,20 @@ def add_like(msg_id):
     user = g.user
     liked_message = msg_id
 
-    new_like = Likes(user_id=user.id, message_id=liked_message)
+    user_instance = User.query.get(user.id)
+    message_instance = Message.query.get(liked_message)
+
+    existing_like = Likes.query.filter_by(user=user_instance, message=message_instance).first()
+
+    if existing_like:
+        db.session.delete(existing_like)
+        db.session.commit()
+
+    else:
+        new_like = Likes(user_id=user.id, message_id=liked_message)
     
-    db.session.add(new_like)
-    db.session.commit()
+        db.session.add(new_like)
+        db.session.commit()
 
     return redirect(f'/messages/{msg_id}')
 
