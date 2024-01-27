@@ -17,17 +17,20 @@
             <span class="text-muted">{{ message.timestamp.strftime('%d %B %Y') }}</span>
             <p>{{ message.text }}</p>
           </div>
-          <form method="POST" action="/users/add_like/{{ message.id }}" id="messages-form">
-            <button>
-            {% if message.id in g.user_likes_ids %}
-            <i class="fa-solid fa-heart-circle-xmark"></i>
-            {% else %}
-            <i class="fa-solid fa-heart"></i>
-            {% endif %}
-            </button>     
-        
-
+          
+          {% if g.user.id != message.user.id%}
+          <form method="POST" action="/users/add_like/{{ message.id }}" id="messages-form">           
+              <button>
+              {% if message.id in g.user_likes_ids %}
+              <i class="fa-solid fa-heart-circle-xmark"></i>
+              {% else %}
+              <i class="fa-solid fa-heart"></i>
+              {% endif %}
+              </button>     
           </form>
+          {% endif %}
+
+          
         </li>
 
       {% endfor %}

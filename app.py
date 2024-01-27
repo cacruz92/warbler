@@ -359,6 +359,20 @@ def add_like(msg_id):
         db.session.commit()
 
     return redirect(f'/messages/{msg_id}')
+    
+@app.route('/users/<int:user_id>/likes')
+def show_user_likes(user_id):
+    "Shows posts that a particular user has liked."
+    
+    if not g.user:
+        flash("Access unauthorized.", "danger")
+        return redirect("/")
+
+    user = User.query.get_or_404(user_id)
+
+    g.user_likes_ids = [like.message.id for like in g.user.likes]
+
+    return render_template('messages/liked_messages.html', user=user, likes=user.likes)
 
 ##############################################################################
 # Turn off all caching in Flask
